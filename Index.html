@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#161826"/><g fill="none" stroke="#9184d9" stroke-width="3"><rect x="30" y="32" width="40" height="36" rx="3"/><path d="M30 44h40M50 44v24"/></g></svg></template>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-2a5df918-6980-4d04-8da7-8192ad8cddd5/styles.css">
+<script src="_ds/nocturne-2a5df918-6980-4d04-8da7-8192ad8cddd5/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--color-bg); }
+  input, select, textarea { font-family: var(--font-body); }
+  .cellin { width: 100%; box-sizing: border-box; background: transparent; border: 0; color: var(--color-text); font-size: 13px; padding: 7px 8px; border-radius: 4px; }
+  .cellin:hover { background: color-mix(in srgb, var(--color-text) 5%, transparent); }
+  .cellin:focus { outline: 2px solid var(--color-accent); outline-offset: -2px; background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+  .cellin::placeholder { color: color-mix(in srgb, var(--color-text) 32%, transparent); }
+  select.cellin option { background: #232532; color: #e9e9ed; }
+  .gridrow:hover .rowtools { opacity: 1; }
+  .rowtools { opacity: 0; transition: opacity .12s; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #3f424d; border-radius: 8px; }
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column; font-family: var(--font-body); color: var(--color-text); background: radial-gradient(1200px 600px at 12% -10%, #1e2136 0%, #161826 60%);">
+
+  <header style="display: flex; align-items: center; gap: 16.8px; flex-wrap: wrap; padding: 14px 22.4px; border-bottom: 1px solid var(--color-divider);">
+    <div style="display: flex; flex-direction: column; gap: 2px; margin-right: auto;">
+      <div style="display: flex; align-items: baseline; gap: 8.4px;">
+        <h1 style="font-size: 17px; margin: 0; letter-spacing: -0.01em;">Tableaux d'appels d'offre</h1>
+        <span style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-accent);">GRETA · Académie de Reims</span>
+      </div>
+      <span style="font-size: 12px; color: color-mix(in srgb, var(--color-text) 55%, transparent);">{{ rowCountLabel }} · {{ savedLabel }}</span>
+    </div>
+    <button class="btn btn-secondary" onClick="{{ reset }}" style="font-size: 13px;">Réinitialiser</button>
+    <button class="btn btn-primary" onClick="{{ copy }}" style="font-size: 13px; padding-inline: 16.8px;">{{ copyLabel }}</button>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); align-items: start; gap: 0; flex: 1;">
+
+    <section style="display: flex; flex-direction: column; gap: 16.8px; padding: 22.4px; border-right: 1px solid var(--color-divider); min-width: 0;">
+      <div style="display: grid; gap: 11.2px;">
+        <label style="display: grid; gap: 5px;">
+          <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Titre du mail</span>
+          <input class="input" value="{{ title }}" onChange="{{ setTitle }}" placeholder="Titre du tableau" style="font-size: 15px;" />
+        </label>
+        <label style="display: grid; gap: 5px;">
+          <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Phrase d'introduction</span>
+          <textarea class="input" value="{{ intro }}" onChange="{{ setIntro }}" rows="3" placeholder="Texte d'introduction (facultatif)" style="font-size: 13px; resize: vertical; line-height: 1.5;"></textarea>
+        </label>
+      </div>
+
+      <div style="border: 1px solid var(--color-divider); border-radius: 8px; overflow: auto; background: color-mix(in srgb, var(--color-surface) 60%, transparent);">
+        <table style="width: 100%; border-collapse: collapse; min-width: 700px; table-layout: fixed;">
+          <thead>
+            <tr>
+              <th style="width: 30px; padding: 8px 4px; font-size: 10px; font-weight: 500; color: color-mix(in srgb, var(--color-text) 40%, transparent); border-bottom: 1px solid var(--color-divider);"></th>
+              <sc-for list="{{ activeCols }}" as="col" hint-placeholder-count="5">
+                <th style="width: {{ col.w }}; text-align: left; padding: 8px; font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 62%, transparent); border-bottom: 1px solid var(--color-divider); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ col.label }}</th>
+              </sc-for>
+              <th style="width: 62px; border-bottom: 1px solid var(--color-divider);"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ rows }}" as="row" hint-placeholder-count="3">
+              <tr class="gridrow" style="border-bottom: 1px solid color-mix(in srgb, var(--color-text) 7%, transparent);">
+                <td style="text-align: center; font-size: 11px; color: color-mix(in srgb, var(--color-text) 35%, transparent);">{{ row.num }}</td>
+                <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="5">
+                  <td style="padding: 0; vertical-align: middle;">
+                    <sc-if value="{{ cell.isSelect }}" hint-placeholder-val="{{ false }}">
+                      <select class="cellin" value="{{ cell.value }}" onChange="{{ cell.onChange }}">
+                        <sc-for list="{{ cell.options }}" as="opt" hint-placeholder-count="3">
+                          <option value="{{ opt }}">{{ opt }}</option>
+                        </sc-for>
+                      </select>
+                    </sc-if>
+                    <sc-if value="{{ cell.isText }}" hint-placeholder-val="{{ true }}">
+                      <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
+                        <sc-if value="{{ cell.hasLogo }}" hint-placeholder-val="{{ false }}">
+                          <div style="flex: none; width: 50px; height: 26px; border-radius: 3px; background-color: #fff; background-repeat: no-repeat; background-position: center; background-size: contain; background-image: {{ cell.logoBg }};"></div>
+                        </sc-if>
+                        <textarea class="cellin" ref="{{ cell.autosize }}" rows="1" value="{{ cell.value }}" onChange="{{ cell.onChange }}" onPaste="{{ cell.onPaste }}" onKeyDown="{{ cell.onKeyDown }}" placeholder="{{ cell.placeholder }}" style="resize: none; overflow: hidden; line-height: 1.4; display: block;"></textarea>
+                        <sc-if value="{{ cell.isLogo }}" hint-placeholder-val="{{ false }}">
+                          <label title="Choisir un logo" style="flex: none; display: grid; place-items: center; width: 22px; height: 22px; margin-right: 4px; cursor: pointer; border-radius: 4px; border: 1px solid var(--color-divider); color: var(--color-accent); font-size: 11px;">↑<input type="file" accept="image/*" onChange="{{ cell.onFile }}" style="display: none;" /></label>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ cell.isInput }}" hint-placeholder-val="{{ false }}">
+                      <input class="cellin" type="{{ cell.type }}" value="{{ cell.value }}" onChange="{{ cell.onChange }}" onPaste="{{ cell.onPaste }}" onKeyDown="{{ cell.onKeyDown }}" placeholder="{{ cell.placeholder }}" />
+                    </sc-if>
+                  </td>
+                </sc-for>
+                <td style="padding-right: 6px;">
+                  <div class="rowtools" style="display: flex; gap: 2px; justify-content: flex-end;">
+                    <button onClick="{{ row.up }}" title="Monter" style="width: 22px; height: 22px; display: grid; place-items: center; cursor: pointer; background: transparent; border: 0; border-radius: 4px; color: color-mix(in srgb, var(--color-text) 55%, transparent); font-size: 11px;">↑</button>
+                    <button onClick="{{ row.down }}" title="Descendre" style="width: 22px; height: 22px; display: grid; place-items: center; cursor: pointer; background: transparent; border: 0; border-radius: 4px; color: color-mix(in srgb, var(--color-text) 55%, transparent); font-size: 11px;">↓</button>
+                    <button onClick="{{ row.remove }}" title="Supprimer" style="width: 22px; height: 22px; display: grid; place-items: center; cursor: pointer; background: transparent; border: 0; border-radius: 4px; color: color-mix(in srgb, var(--color-text) 55%, transparent); font-size: 13px;">×</button>
+                  </div>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <button onClick="{{ addRow }}" style="width: 100%; text-align: left; padding: 9px 12px; cursor: pointer; background: transparent; border: 0; color: var(--color-accent); font-size: 12.5px; font-family: var(--font-body);">+ Ajouter une ligne</button>
+      </div>
+
+      <p style="margin: 0; font-size: 11.5px; line-height: 1.6; color: color-mix(in srgb, var(--color-text) 45%, transparent);">Collez une plage Excel dans une cellule pour remplir plusieurs lignes d'un coup. Entrée passe à la ligne dans la cellule, Ctrl + Entrée ajoute une ligne au tableau.</p>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16.8px; padding: 22.4px; min-width: 0;">
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16.8px; align-items: flex-start;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Accent</span>
+          <div style="display: flex; gap: 6px;">
+            <sc-for list="{{ swatches }}" as="sw" hint-placeholder-count="3">
+              <button onClick="{{ sw.pick }}" title="{{ sw.name }}" style="width: 26px; height: 26px; border-radius: 6px; cursor: pointer; background: {{ sw.color }}; border: 2px solid {{ sw.ring }};"></button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Largeur du tableau</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <input class="input" type="number" min="30" max="100" step="5" value="{{ tableWidth }}" onChange="{{ setTableWidth }}" style="width: 72px; font-size: 13px; padding: 6px 8px;" />
+            <span style="font-size: 12px; color: color-mix(in srgb, var(--color-text) 55%, transparent);">% du mail</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Densité</span>
+          <div class="seg">
+            <button class="seg-opt" onClick="{{ setCompact }}" aria-pressed="{{ isCompact }}" style="font-size: 12px;">Compact</button>
+            <button class="seg-opt" onClick="{{ setComfy }}" aria-pressed="{{ isComfy }}" style="font-size: 12px;">Confortable</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Colonnes &amp; ordre</span>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <sc-for list="{{ colsUI }}" as="c" hint-placeholder-count="7">
+            <div style="display: flex; align-items: center; gap: 8.4px; padding: 5px 8px; border-radius: 6px; background: color-mix(in srgb, var(--color-surface) 70%, transparent);">
+              <button onClick="{{ c.toggle }}" title="Afficher ou masquer" style="flex: none; width: 14px; height: 14px; padding: 0; cursor: pointer; border-radius: 3px; display: grid; place-items: center; font-size: 10px; line-height: 1; border: 1px solid {{ c.boxBorder }}; background: {{ c.boxBg }}; color: #161826; font-family: var(--font-body);">{{ c.check }}</button>
+              <input class="cellin" value="{{ c.label }}" onChange="{{ c.rename }}" style="flex: 1; min-width: 0; padding: 3px 5px; font-size: 12.5px; color: {{ c.textColor }};" />
+              <input class="cellin" type="number" min="3" max="80" value="{{ c.width }}" onChange="{{ c.setWidth }}" title="Largeur en %" style="flex: none; width: 46px; padding: 3px 4px; font-size: 12px; text-align: right;" />
+              <span style="flex: none; font-size: 11px; color: color-mix(in srgb, var(--color-text) 40%, transparent);">%</span>
+              <button onClick="{{ c.openType }}" title="Type d'information" style="flex: none; padding: 2px 7px; cursor: pointer; border-radius: 4px; border: 1px solid var(--color-divider); background: transparent; color: var(--color-accent); font-size: 11px; font-family: var(--font-body);">{{ c.typeName }}</button>
+              <button onClick="{{ c.up }}" title="Monter" style="width: 20px; height: 20px; cursor: pointer; background: transparent; border: 0; border-radius: 4px; color: color-mix(in srgb, var(--color-text) 45%, transparent); font-size: 11px;">↑</button>
+              <button onClick="{{ c.down }}" title="Descendre" style="width: 20px; height: 20px; cursor: pointer; background: transparent; border: 0; border-radius: 4px; color: color-mix(in srgb, var(--color-text) 45%, transparent); font-size: 11px;">↓</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8.4px; min-width: 0;">
+        <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Aperçu du mail</span>
+        <div style="border-radius: 8px; overflow: auto; box-shadow: var(--shadow-md); background: #ffffff; padding: 20px;">{{ previewNode }}</div>
+        <button class="btn btn-primary" onClick="{{ copy }}" style="align-self: flex-start; font-size: 13px;">{{ copyLabel }}</button>
+      </div>
+
+    </section>
+  </div>
+
+  <sc-if value="{{ dlgOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop" style="position: fixed; inset: 0; display: grid; place-items: center; background: rgba(10,11,18,0.66); z-index: 40;">
+      <div class="dialog" style="width: min(420px, 92vw); display: flex; flex-direction: column; gap: 16.8px; padding: 22.4px; border-radius: 14px; background: var(--color-surface); box-shadow: var(--shadow-lg);">
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-accent);">Type d'information</span>
+          <h2 style="margin: 0; font-size: 16px;">{{ dlg.label }}</h2>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <sc-for list="{{ dlg.types }}" as="t" hint-placeholder-count="5">
+            <button onClick="{{ t.pick }}" style="text-align: left; padding: 8px 11.2px; cursor: pointer; border-radius: 8px; border: 1px solid {{ t.border }}; background: {{ t.bg }}; color: var(--color-text); font-size: 13px; font-family: var(--font-body);">{{ t.name }}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ dlg.isSelect }}" hint-placeholder-val="{{ false }}">
+          <label style="display: grid; gap: 5px;">
+            <span style="font-size: 11px; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Choix proposés — un par ligne (laissez la première ligne vide pour « aucun »)</span>
+            <textarea class="input" rows="6" value="{{ dlg.choicesText }}" onChange="{{ dlg.setChoices }}" style="font-size: 13px; line-height: 1.5; resize: vertical;"></textarea>
+          </label>
+        </sc-if>
+        <sc-if value="{{ dlg.isImage }}" hint-placeholder-val="{{ false }}">
+          <label style="display: flex; align-items: center; gap: 8.4px;">
+            <span style="font-size: 12px; color: color-mix(in srgb, var(--color-text) 70%, transparent);">Hauteur de l'image</span>
+            <input class="input" type="number" min="14" max="140" step="2" value="{{ dlg.imgH }}" onChange="{{ dlg.setImgH }}" style="width: 76px; font-size: 13px; padding: 6px 8px;" />
+            <span style="font-size: 12px; color: color-mix(in srgb, var(--color-text) 45%, transparent);">px, ratio conservé</span>
+          </label>
+        </sc-if>
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="btn btn-primary" onClick="{{ closeDlg }}" style="font-size: 13px;">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#154194&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#154194&quot;,&quot;#f39200&quot;,&quot;#3f4757&quot;]},&quot;defaultDensity&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;compact&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;compact&quot;,&quot;comfy&quot;]}}">
+const COLS = [
+  { key: 'commanditaire', label: 'Commanditaire', type: 'image', w: '14%', ph: 'Région' },
+  { key: 'intitule', label: "Intitulé du marché", type: 'text', w: '22%', ph: 'Bureautique' },
+  { key: 'lots', label: 'Lots concernés', type: 'text', w: '9%', ph: 'Lot 2' },
+  { key: 'domaine', label: 'Domaine de formation', type: 'text', w: '14%', ph: 'Tertiaire' },
+  { key: 'dateLimite', label: 'Date limite de clôture', type: 'date', w: '12%', ph: '' },
+  { key: 'budget', label: 'Estimation budgétaire', type: 'text', w: '11%', ph: '120 000 €' },
+  { key: 'lieu', label: "Lieu d'exécution", type: 'text', w: '10%', ph: 'Reims' },
+  { key: 'statut', label: 'Statut', type: 'select', w: '8%', ph: '' }
+];
+const STATUTS = ['', 'Nouveau', 'À étudier', 'En cours', 'Répondu', 'Abandonné'];
+const TYPES = [
+  { id: 'text', name: 'Texte' },
+  { id: 'euros', name: 'Valeur en euros' },
+  { id: 'date', name: 'Date' },
+  { id: 'select', name: 'Liste à choix' },
+  { id: 'image', name: 'Image' }
+];
+const SWATCHES = [
+  { name: 'Bleu académique', color: '#154194' },
+  { name: 'Orange', color: '#f39200' },
+  { name: 'Ardoise', color: '#3f4757' }
+];
+const ZEBRA = '#E3E5F1';
+const KEY = 'greta-ao-tableau-v1';
+const MONTHS = ['janv.', 'févr.', 'mars', 'avril', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+
+function blankRow() {
+  const r = { id: Math.random().toString(36).slice(2) };
+  COLS.forEach(c => { r[c.key] = ''; });
+  return r;
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+class Component extends DCLogic {
+  state = {
+    title: "Appels d'offre en cours — réseau des GRETA de l'académie de Reims",
+    intro: "Voici les consultations repérées cette semaine. Merci de signaler au pilote les lots sur lesquels votre GRETA souhaite se positionner.",
+    accent: this.props.accentColor || '#154194',
+    density: this.props.defaultDensity || 'compact',
+    threshold: 7,
+    order: COLS.map(c => c.key),
+    widths: (function () { const w = {}; COLS.forEach(c => { w[c.key] = parseInt(c.w, 10); }); return w; })(),
+    tableWidth: 100,
+    labels: {},
+    types: {},
+    choices: { statut: STATUTS.slice() },
+    imgH: {},
+    editing: null,
+    hidden: [],
+    rows: [blankRow(), blankRow(), blankRow()],
+    copied: false,
+    saved: false
+  };
+
+  componentDidMount() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        this.setState(s => ({
+          title: d.title != null ? d.title : s.title,
+          intro: d.intro != null ? d.intro : s.intro,
+          accent: d.accent || s.accent,
+          density: d.density || s.density,
+          threshold: d.threshold != null ? d.threshold : s.threshold,
+          order: (function () {
+            const base = COLS.map(c => c.key);
+            let o = Array.isArray(d.order) && d.order.length ? d.order.filter(k => base.indexOf(k) >= 0) : base.slice();
+            base.forEach((k, i) => { if (o.indexOf(k) < 0) o.splice(i, 0, k); });
+            return o;
+          })(),
+          widths: Object.assign({}, s.widths, d.widths && typeof d.widths === 'object' ? d.widths : {}),
+          tableWidth: d.tableWidth != null ? d.tableWidth : s.tableWidth,
+          hidden: Array.isArray(d.hidden) ? d.hidden : s.hidden,
+          labels: d.labels && typeof d.labels === 'object' ? d.labels : s.labels,
+          types: d.types && typeof d.types === 'object' ? d.types : s.types,
+          choices: Object.assign({}, s.choices, d.choices && typeof d.choices === 'object' ? d.choices : {}),
+          imgH: Object.assign({}, s.imgH, d.imgH && typeof d.imgH === 'object' ? d.imgH : {}),
+          rows: Array.isArray(d.rows) && d.rows.length ? d.rows : s.rows,
+          saved: true
+        }));
+      }
+    } catch (e) { /* premier lancement */ }
+  }
+
+  componentDidUpdate(pp, ps) {
+    if (ps.rows !== this.state.rows || ps.title !== this.state.title || ps.intro !== this.state.intro ||
+        ps.accent !== this.state.accent || ps.density !== this.state.density ||
+        ps.threshold !== this.state.threshold || ps.order !== this.state.order || ps.hidden !== this.state.hidden ||
+        ps.labels !== this.state.labels || ps.widths !== this.state.widths || ps.tableWidth !== this.state.tableWidth ||
+        ps.types !== this.state.types || ps.choices !== this.state.choices || ps.imgH !== this.state.imgH) {
+      const { title, intro, accent, density, order, hidden, labels, widths, tableWidth, types, choices, imgH, rows } = this.state;
+      try { localStorage.setItem(KEY, JSON.stringify({ title, intro, accent, density, order, hidden, labels, widths, tableWidth, types, choices, imgH, rows })); } catch (e) {}
+      if (!this.state.saved) this.setState({ saved: true });
+    }
+  }
+
+  activeCols() {
+    const map = {};
+    COLS.forEach(c => { map[c.key] = c; });
+    return this.state.order.map(k => map[k])
+      .filter(c => c && this.state.hidden.indexOf(c.key) === -1)
+      .map(c => Object.assign({}, c, {
+        label: this.state.labels[c.key] != null ? this.state.labels[c.key] : c.label,
+        type: this.colType(c.key),
+        choices: this.state.choices[c.key] || ['', 'Option 1', 'Option 2'],
+        imgH: this.state.imgH[c.key] != null ? this.state.imgH[c.key] : 38,
+        w: (this.state.widths[c.key] != null ? this.state.widths[c.key] : parseInt(c.w, 10)) + '%'
+      }));
+  }
+
+  colType(key) {
+    const t = this.state.types[key];
+    if (t) return t;
+    const base = COLS.filter(c => c.key === key)[0];
+    return base ? (base.type === 'logo' ? 'image' : base.type) : 'text';
+  }
+
+  rowImg(r, key) {
+    return r['img_' + key] || (key === 'commanditaire' ? r.commanditaireLogo || '' : '');
+  }
+
+  setWidthTo(key, raw) {
+    const nv = Math.max(3, Math.min(90, parseInt(raw, 10) || 0));
+    this.setState(st => {
+      const vis = st.order.filter(k => st.hidden.indexOf(k) === -1);
+      if (vis.indexOf(key) < 0) return {};
+      const w = Object.assign({}, st.widths);
+      const others = vis.filter(k => k !== key);
+      const remain = Math.max(others.length * 3, 100 - nv);
+      const sum = others.reduce((a, k) => a + (w[k] || 3), 0) || 1;
+      others.forEach(k => { w[k] = Math.max(3, Math.round((w[k] || 3) * remain / sum)); });
+      w[key] = nv;
+      if (others.length) {
+        const diff = 100 - vis.reduce((a, k) => a + w[k], 0);
+        const last = others[others.length - 1];
+        w[last] = Math.max(3, w[last] + diff);
+      }
+      return { widths: w, copied: false };
+    });
+  }
+
+  fmtEuro(v) {
+    const s = String(v == null ? '' : v).trim();
+    if (!s) return '';
+    if (/[€%a-zA-Z]/.test(s)) return s;
+    const n = Number(s.replace(/\s/g, '').replace(/\./g, '').replace(',', '.'));
+    if (isNaN(n)) return s;
+    return n.toLocaleString('fr-FR') + ' €';
+  }
+
+  setCell(id, key, v) {
+    this.setState(s => ({ rows: s.rows.map(r => r.id === id ? Object.assign({}, r, { [key]: v }) : r), copied: false }));
+  }
+
+  pasteInto(rowIdx, colIdx, text) {
+    const lines = text.replace(/\r/g, '').split('\n').filter(l => l.length);
+    const cols = this.activeCols();
+    this.setState(s => {
+      const rows = s.rows.slice();
+      lines.forEach((line, li) => {
+        const parts = line.split('\t');
+        const target = rowIdx + li;
+        while (rows.length <= target) rows.push(blankRow());
+        const patch = {};
+        parts.forEach((p, pi) => {
+          const col = cols[colIdx + pi];
+          if (col) patch[col.key] = p.trim();
+        });
+        rows[target] = Object.assign({}, rows[target], patch);
+      });
+      return { rows: rows, copied: false };
+    });
+  }
+
+  addAfter(idx) {
+    this.setState(s => {
+      const rows = s.rows.slice();
+      rows.splice(idx + 1, 0, blankRow());
+      return { rows: rows, copied: false };
+    });
+  }
+
+  move(idx, dir) {
+    this.setState(s => {
+      const rows = s.rows.slice();
+      const j = idx + dir;
+      if (j < 0 || j >= rows.length) return {};
+      const t = rows[idx]; rows[idx] = rows[j]; rows[j] = t;
+      return { rows: rows, copied: false };
+    });
+  }
+
+  moveCol(key, dir) {
+    this.setState(s => {
+      const order = s.order.slice();
+      const i = order.indexOf(key);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= order.length) return {};
+      order[i] = order[j]; order[j] = key;
+      return { order: order, copied: false };
+    });
+  }
+
+  daysLeft(iso) {
+    if (!iso) return null;
+    const d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return null;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return Math.round((d - now) / 86400000);
+  }
+
+  fmtDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return iso;
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  statutStyle(v) {
+    const a = this.state.accent;
+    if (v === 'Abandonné') return 'background:#eceef4;color:#5a6274;';
+    if (v === 'Répondu') return 'background:#e6f0e8;color:#2f6b3c;';
+    if (v === 'En cours') return 'background:' + a + '1f;color:' + a + ';';
+    if (v === 'Nouveau') return 'background:#fdefd9;color:#8a5300;';
+    return 'background:#eceef4;color:#5a6274;';
+  }
+
+  buildEmailHtml() {
+    const { title, intro, accent, density, rows } = this.state;
+    const cols = this.activeCols();
+    const pad = density === 'compact' ? '7px 10px' : '11px 14px';
+    const fs = density === 'compact' ? '13px' : '14px';
+    const filled = rows.filter(r => cols.some(c => String(r[c.key] || '').trim().length || this.rowImg(r, c.key)));
+    let h = '<div style="font-family:Arial,Helvetica,sans-serif;color:#1f2430;background:#ffffff;background-color:#ffffff;font-size:14px;line-height:1.55;max-width:840px;">';
+    if (title.trim()) {
+      h += '<div style="font-size:18px;font-weight:bold;color:' + accent + ';margin:0 0 8px;">' + esc(title) + '</div>';
+      h += '<div style="height:3px;width:52px;background:' + accent + ';margin:0 0 14px;"></div>';
+    }
+    if (intro.trim()) h += '<p style="margin:0 0 16px;color:#3a4152;">' + esc(intro).replace(/\n/g, '<br>') + '</p>';
+    const tw = Math.max(30, Math.min(100, Number(this.state.tableWidth) || 100));
+    h += '<table cellpadding="0" cellspacing="0" border="0" width="' + tw + '%" style="border-collapse:collapse;width:' + tw + '%;font-size:' + fs + ';">';
+    h += '<tr>' + cols.map(c =>
+      '<th width="' + c.w + '" style="text-align:left;padding:' + pad + ';background:' + accent + ';color:#ffffff;font-size:11.5px;font-weight:bold;letter-spacing:0.04em;text-transform:uppercase;border:1px solid ' + accent + ';">' + esc(c.label) + '</th>'
+    ).join('') + '</tr>';
+    filled.forEach((r, i) => {
+      const bg = i % 2 ? '#ffffff' : ZEBRA;
+      h += '<tr>' + cols.map(c => {
+        const border = 'border:1px solid #ccd1e4;';
+        if (c.type === 'date') {
+          const dl = this.daysLeft(r[c.key]);
+          const txt = esc(this.fmtDate(r[c.key]));
+          if (dl == null || !txt) return '<td style="padding:' + pad + ';background:' + bg + ';' + border + 'white-space:nowrap;"></td>';
+          let cellBg = bg, fg = '#1f2430', weight = '', note = '';
+          if (dl < 0) { fg = '#8a8f9e'; note = 'échue'; }
+          else if (dl <= 21) { cellBg = '#fbe6e4'; fg = '#a4231b'; weight = 'font-weight:bold;'; note = dl === 0 ? "aujourd'hui" : 'J-' + dl; }
+          else if (dl <= 42) { cellBg = '#fdf0dd'; fg = '#8f5300'; weight = 'font-weight:bold;'; note = 'J-' + dl; }
+          else { cellBg = '#e7f1ea'; fg = '#2f6b3c'; note = 'J-' + dl; }
+          const inner = '<span style="color:' + fg + ';' + weight + (dl < 0 ? 'text-decoration:line-through;' : '') + '">' + txt + '</span>' +
+            (note ? '<br><span style="font-size:11px;color:' + fg + ';">' + note + '</span>' : '');
+          return '<td style="padding:' + pad + ';background:' + cellBg + ';' + border + 'white-space:nowrap;">' + inner + '</td>';
+        }
+        if (c.type === 'image') {
+          const logo = this.rowImg(r, c.key);
+          const nom = String(r[c.key] || '').trim();
+          let inner = '';
+          if (logo) inner += '<img src="' + logo + '" alt="' + esc(nom) + '" height="' + c.imgH + '" style="display:inline-block;height:' + c.imgH + 'px;width:auto;max-width:100%;border:0;" />';
+          if (nom) inner += (logo ? '<div style="margin-top:4px;font-size:12px;color:#3a4152;">' + esc(nom) + '</div>' : '<span style="font-weight:bold;">' + esc(nom).replace(/\n/g, '<br>') + '</span>');
+          return '<td align="center" style="padding:' + pad + ';background:' + bg + ';' + border + 'text-align:center;vertical-align:middle;">' + inner + '</td>';
+        }
+        if (c.type === 'select') {
+          const v = String(r[c.key] || '').trim();
+          const inner = v ? '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:bold;' + this.statutStyle(v) + '">' + esc(v) + '</span>' : '';
+          return '<td style="padding:' + pad + ';background:' + bg + ';' + border + 'white-space:nowrap;">' + inner + '</td>';
+        }
+        if (c.type === 'euros') {
+          return '<td align="right" style="padding:' + pad + ';background:' + bg + ';' + border + 'text-align:right;white-space:nowrap;">' + esc(this.fmtEuro(r[c.key])) + '</td>';
+        }
+        const strong = c.key === 'intitule' ? 'font-weight:bold;' : '';
+        return '<td style="padding:' + pad + ';background:' + bg + ';' + border + strong + '">' + esc(r[c.key]).replace(/\n/g, '<br>') + '</td>';
+      }).join('') + '</tr>';
+    });
+    if (!filled.length) {
+      h += '<tr><td colspan="' + cols.length + '" style="padding:' + pad + ';background:' + ZEBRA + ';border:1px solid #ccd1e4;color:#6b7288;">Aucune ligne renseignée pour le moment.</td></tr>';
+    }
+    h += '</table></div>';
+    return h;
+  }
+
+  async copy() {
+    const html = this.buildEmailHtml();
+    const plain = this.activeCols().map(c => c.label).join('\t') + '\n' +
+      this.state.rows.map(r => this.activeCols().map(c => c.key === 'dateLimite' ? this.fmtDate(r.dateLimite) : (r[c.key] || '')).join('\t')).join('\n');
+    let ok = false;
+    try {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([plain], { type: 'text/plain' })
+      })]);
+      ok = true;
+    } catch (e) {
+      try {
+        const d = document.createElement('div');
+        d.setAttribute('contenteditable', 'true');
+        d.style.cssText = 'position:fixed;left:-9999px;top:0;background:#ffffff;color:#1f2430;';
+        d.innerHTML = html;
+        document.body.appendChild(d);
+        const rg = document.createRange();
+        rg.selectNodeContents(d);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(rg);
+        ok = document.execCommand('copy');
+        sel.removeAllRanges();
+        document.body.removeChild(d);
+      } catch (e2) { ok = false; }
+    }
+    if (ok) {
+      this.setState({ copied: true });
+      clearTimeout(this._t);
+      this._t = setTimeout(() => this.setState({ copied: false }), 2200);
+    }
+  }
+
+  renderVals() {
+    const s = this.state;
+    const cols = this.activeCols();
+    const rows = s.rows.map((r, idx) => ({
+      num: idx + 1,
+      up: () => this.move(idx, -1),
+      down: () => this.move(idx, 1),
+      remove: () => this.setState(st => ({ rows: st.rows.length > 1 ? st.rows.filter(x => x.id !== r.id) : [blankRow()], copied: false })),
+      cells: cols.map((c, ci) => ({
+        isSelect: c.type === 'select',
+        isLogo: c.type === 'image',
+        isText: c.type === 'text' || c.type === 'euros' || c.type === 'image',
+        isInput: c.type === 'date',
+        hasLogo: !!this.rowImg(r, c.key),
+        logoBg: this.rowImg(r, c.key) ? 'url("' + this.rowImg(r, c.key) + '")' : 'none',
+        onFile: e => {
+          const f = e.target.files && e.target.files[0];
+          if (!f) return;
+          const fr = new FileReader();
+          fr.onload = () => this.setState(st => ({ rows: st.rows.map(x => x.id === r.id ? Object.assign({}, x, { ['img_' + c.key]: fr.result, commanditaireLogo: c.key === 'commanditaire' ? '' : x.commanditaireLogo }) : x), copied: false }));
+          fr.readAsDataURL(f);
+          e.target.value = '';
+        },
+        clearLogo: () => this.setState(st => ({ rows: st.rows.map(x => x.id === r.id ? Object.assign({}, x, { ['img_' + c.key]: '', commanditaireLogo: c.key === 'commanditaire' ? '' : x.commanditaireLogo }) : x), copied: false })),
+        autosize: el => { if (el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; } },
+        type: c.type === 'date' ? 'date' : 'text',
+        placeholder: idx === 0 ? c.ph : '',
+        options: c.choices,
+        value: r[c.key] || '',
+        onChange: e => {
+          if (c.type !== 'date' && c.type !== 'select') { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }
+          this.setCell(r.id, c.key, e.target.value);
+        },
+        onKeyDown: e => {
+          if (e.key !== 'Enter') return;
+          if (e.ctrlKey || e.metaKey) { e.preventDefault(); this.addAfter(idx); return; }
+          if (c.type !== 'date' && c.type !== 'select') return;
+          e.preventDefault();
+          const td = e.target.closest('td');
+          const tr = td && td.closest('tr');
+          const col = td ? Array.prototype.indexOf.call(tr.children, td) : -1;
+          const next = tr && tr.nextElementSibling;
+          if (next && col >= 0) {
+            const f = next.children[col] && next.children[col].querySelector('input, select');
+            if (f) { f.focus(); if (f.select) f.select(); }
+          } else {
+            this.addAfter(idx);
+          }
+        },
+        onPaste: e => {
+          const t = (e.clipboardData || window.clipboardData).getData('text');
+          if (t && (t.indexOf('\t') >= 0 || t.indexOf('\n') >= 0)) { e.preventDefault(); this.pasteInto(idx, ci, t); }
+        }
+      }))
+    }));
+
+    return {
+      title: s.title,
+      intro: s.intro,
+      activeCols: cols,
+      rows: rows,
+      rowCountLabel: s.rows.length + (s.rows.length > 1 ? ' lignes' : ' ligne'),
+      savedLabel: s.saved ? 'enregistré sur ce poste' : 'brouillon',
+      copyLabel: s.copied ? 'Copié ✓' : 'Copier le tableau',
+      tableWidth: s.tableWidth,
+      setTableWidth: e => this.setState({ tableWidth: Math.max(30, Math.min(100, parseInt(e.target.value, 10) || 100)), copied: false }),
+      isCompact: s.density === 'compact',
+      isComfy: s.density === 'comfy',
+      setCompact: () => this.setState({ density: 'compact' }),
+      setComfy: () => this.setState({ density: 'comfy' }),
+      setTitle: e => this.setState({ title: e.target.value, copied: false }),
+      setIntro: e => this.setState({ intro: e.target.value, copied: false }),
+      addRow: () => this.addAfter(s.rows.length - 1),
+      reset: () => { if (confirm('Vider le tableau et le texte ?')) this.setState({ rows: [blankRow(), blankRow(), blankRow()], copied: false }); },
+      copy: () => this.copy(),
+      swatches: SWATCHES.map(sw => ({
+        name: sw.name,
+        color: sw.color,
+        ring: s.accent === sw.color ? '#e9e9ed' : 'transparent',
+        pick: () => this.setState({ accent: sw.color, copied: false })
+      })),
+      colsUI: COLS.slice().sort((a, b) => s.order.indexOf(a.key) - s.order.indexOf(b.key)).map(c => {
+        const on = s.hidden.indexOf(c.key) === -1;
+        return {
+          label: s.labels[c.key] != null ? s.labels[c.key] : c.label,
+          width: s.widths[c.key] != null ? s.widths[c.key] : parseInt(c.w, 10),
+          setWidth: e => this.setWidthTo(c.key, e.target.value),
+          typeName: (TYPES.filter(t => t.id === this.colType(c.key))[0] || TYPES[0]).name,
+          openType: () => this.setState({ editing: c.key }),
+          rename: e => this.setState(st => ({ labels: Object.assign({}, st.labels, { [c.key]: e.target.value }), copied: false })),
+          check: on ? '✓' : '',
+          boxBg: on ? '#9184d9' : 'transparent',
+          boxBorder: on ? '#9184d9' : '#595d6c',
+          textColor: on ? '#e9e9ed' : '#75798c',
+          toggle: () => this.setState(st => ({ hidden: on ? st.hidden.concat([c.key]) : st.hidden.filter(k => k !== c.key), copied: false })),
+          up: () => this.moveCol(c.key, -1),
+          down: () => this.moveCol(c.key, 1)
+        };
+      }),
+      dlgOpen: !!s.editing,
+      dlg: (function (self) {
+        const k = s.editing;
+        if (!k) return { label: '', types: [], isSelect: false, isImage: false, choicesText: '', imgH: 38 };
+        const t = self.colType(k);
+        const base = COLS.filter(c => c.key === k)[0] || {};
+        return {
+          label: s.labels[k] != null ? s.labels[k] : base.label,
+          types: TYPES.map(tt => ({
+            name: tt.name,
+            border: t === tt.id ? '#9184d9' : '#3f424d',
+            bg: t === tt.id ? 'color-mix(in srgb, #9184d9 16%, transparent)' : 'transparent',
+            pick: () => self.setState(st => ({ types: Object.assign({}, st.types, { [k]: tt.id }), copied: false }))
+          })),
+          isSelect: t === 'select',
+          isImage: t === 'image',
+          choicesText: (s.choices[k] || ['', 'Option 1', 'Option 2']).join('\n'),
+          setChoices: e => {
+            const list = e.target.value.split('\n');
+            self.setState(st => ({ choices: Object.assign({}, st.choices, { [k]: list }), copied: false }));
+          },
+          imgH: s.imgH[k] != null ? s.imgH[k] : 38,
+          setImgH: e => {
+            const v = Math.max(14, Math.min(140, parseInt(e.target.value, 10) || 38));
+            self.setState(st => ({ imgH: Object.assign({}, st.imgH, { [k]: v }), copied: false }));
+          }
+        };
+      })(this),
+      closeDlg: () => this.setState({ editing: null }),
+      previewNode: React.createElement('div', { dangerouslySetInnerHTML: { __html: this.buildEmailHtml() } })
+    };
+  }
+}
+</script>
+</body>
+</html>
